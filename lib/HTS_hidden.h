@@ -505,6 +505,33 @@ void HTS_Vocoder_synthesize(HTS_Vocoder * v, size_t m, double lf0, double *spect
 /* HTS_Vocoder_clear: clear vocoder */
 void HTS_Vocoder_clear(HTS_Vocoder * v);
 
+/* WORLD vocoder --------------------------------------------------- */
+
+#define WORLD_FFT_SIZE 1024
+
+/* WORLD_Vocoder: structure for setting of vocoder */
+typedef struct _WORLD_Vocoder {
+   double fprd;                 /* frame shift */
+   size_t rate;                 /* sampling rate */
+   size_t fft_size;             /* fft size */
+   size_t total_frame;          /* total frames */
+   double *f0_buff;             /* used in f0 */
+   size_t f0_size;              /* buffer size for f0 */
+   double **spectrum_buff;      /* used in spectrum */
+   size_t spectrum_size;        /* buffer size for spectrum */
+   double **aperiodicity_buff;  /* used in aperiodicity */
+   size_t aperiodicity_size;    /* buffer size for aperiodicity */
+} WORLD_Vocoder;
+
+/* WORLD_Vocoder_initialize: initialize vocoder */
+void WORLD_Vocoder_initialize(WORLD_Vocoder * v, size_t total_frame, size_t rate, double fperiod, size_t fft_size);
+
+/* WORLD_Vocoder_synthesize: WORLD based waveform synthesis */
+void WORLD_Vocoder_synthesize(WORLD_Vocoder * v, double **lf0, double **mcep, size_t mcep_dim, double alpha, double gamma, double **five_band_aperiodicity, double *rawdata, HTS_Audio * audio);
+
+/* WORLD_Vocoder_clear: clear vocoder */
+void WORLD_Vocoder_clear(WORLD_Vocoder * v);
+
 HTS_HIDDEN_H_END;
 
 #endif                          /* !HTS_HIDDEN_H */

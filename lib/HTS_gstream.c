@@ -148,6 +148,88 @@ HTS_Boolean HTS_GStreamSet_create(HTS_GStreamSet * gss, HTS_PStreamSet * pss, si
    return TRUE;
 }
 
+/* HTS_GStreamSet_create: generate speech */
+HTS_Boolean HTS_GStreamSet_create_WORLD(HTS_GStreamSet * gss, HTS_PStreamSet * pss, size_t stage, HTS_Boolean use_log_gain, size_t sampling_rate, size_t fperiod, double alpha, double beta, HTS_Boolean * stop, double volume, HTS_Audio * audio)
+{
+   size_t i, j, k;
+   size_t msd_frame;
+   WORLD_Vocoder v;
+   size_t nlpf = 0;
+   double *lpf = NULL;
+   double gamma = 0.0;
+
+   /* check */
+   if (gss->gstream || gss->gspeech) {
+      HTS_error(1, "HTS_GStreamSet_create: HTS_GStreamSet is not initialized.\n");
+      return FALSE;
+   }
+
+   /* initialize */
+   gss->nstream = HTS_PStreamSet_get_nstream(pss);
+   gss->total_frame = HTS_PStreamSet_get_total_frame(pss);
+   gss->total_nsample = fperiod * gss->total_frame;
+   gss->gstream = (HTS_GStream *) HTS_calloc(gss->nstream, sizeof(HTS_GStream));
+   for (i = 0; i < gss->nstream; i++) {
+      gss->gstream[i].vector_length = HTS_PStreamSet_get_vector_length(pss, i);
+      gss->gstream[i].par = (double **) HTS_calloc(gss->total_frame, sizeof(double *));
+      for (j = 0; j < gss->total_frame; j++)
+         gss->gstream[i].par[j] = (double *) HTS_calloc(gss->gstream[i].vector_length, sizeof(double));
+   }
+   gss->gspeech = (double *) HTS_calloc(gss->total_nsample, sizeof(double));
+
+   /* copy generated parameter */
+   for (i = 0; i < gss->nstream; i++) {
+      if (HTS_PStreamSet_is_msd(pss, i)) {      /* for MSD */
+         for (j = 0, msd_frame = 0; j < gss->total_frame; j++)
+            if (HTS_PStreamSet_get_msd_flag(pss, i, j) == TRUE) {
+               for (k = 0; k < gss->gstream[i].vector_length; k++)
+                  gss->gstream[i].par[j][k] = HTS_PStreamSet_get_parameter(pss, i, msd_frame, k);
+               msd_frame++;
+            } else
+               for (k = 0; k < gss->gstream[i].vector_length; k++)
+                  gss->gstream[i].par[j][k] = HTS_NODATA;
+      } else {                  /* for non MSD */
+         for (j = 0; j < gss->total_frame; j++)
+            for (k = 0; k < gss->gstream[i].vector_length; k++)
+               gss->gstream[i].par[j][k] = HTS_PStreamSet_get_parameter(pss, i, j, k);
+      }
+   }
+
+   /* check */
+   if (gss->nstream != 3 && gss->nstream != 4) {
+      HTS_error(1, "HTS_GStreamSet_create_WORLD: The number of streams should be 3 or 4.\n");
+      HTS_GStreamSet_clear(gss);
+      return FALSE;
+   }
+   if (HTS_PStreamSet_get_vector_length(pss, 1) != 1) {
+      HTS_error(1, "HTS_GStreamSet_create_WORLD: The size of lf0 static vector should be 1.\n");
+      HTS_GStreamSet_clear(gss);
+      return FALSE;
+   }
+   if (gss->nstream >= 3 && gss->gstream[2].vector_length % 2 == 0) {
+      HTS_error(1, "HTS_GStreamSet_create_WORLD: The number of low-pass filter coefficient should be odd numbers.");
+      HTS_GStreamSet_clear(gss);
+      return FALSE;
+   }
+   if (sampling_rate != 16000) {
+      HTS_error(1, "HTS_GStreamSet_create_WORLD: The number of sampling-rate should be 16kHz.");
+      HTS_GStreamSet_clear(gss);
+      return FALSE;
+   }
+
+   if (stage != 0)
+      gamma = -1.0 / stage;
+
+   /* synthesize speech waveform with WORLD */
+   WORLD_Vocoder_initialize(&v, gss->total_frame, sampling_rate, fperiod, WORLD_FFT_SIZE);
+   WORLD_Vocoder_synthesize(&v, gss->gstream[1].par, gss->gstream[0].par, gss->gstream[0].vector_length, alpha, gamma, gss->gstream[2].par, gss->gspeech, audio);
+   WORLD_Vocoder_clear(&v);
+   if (audio)
+      HTS_Audio_flush(audio);
+
+   return TRUE;
+}
+
 /* HTS_GStreamSet_get_total_nsamples: get total number of sample */
 size_t HTS_GStreamSet_get_total_nsamples(HTS_GStreamSet * gss)
 {

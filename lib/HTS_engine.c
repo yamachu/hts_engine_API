@@ -488,6 +488,12 @@ HTS_Boolean HTS_Engine_generate_sample_sequence(HTS_Engine * engine)
    return HTS_GStreamSet_create(&engine->gss, &engine->pss, engine->condition.stage, engine->condition.use_log_gain, engine->condition.sampling_frequency, engine->condition.fperiod, engine->condition.alpha, engine->condition.beta, &engine->condition.stop, engine->condition.volume, engine->condition.audio_buff_size > 0 ? &engine->audio : NULL);
 }
 
+/* HTS_Engine_generate_sample_sequence: generate sample sequence (3rd synthesis step) */
+HTS_Boolean HTS_Engine_generate_sample_sequence_WORLD(HTS_Engine * engine)
+{
+   return HTS_GStreamSet_create_WORLD(&engine->gss, &engine->pss, engine->condition.stage, engine->condition.use_log_gain, engine->condition.sampling_frequency, engine->condition.fperiod, engine->condition.alpha, engine->condition.beta, &engine->condition.stop, engine->condition.volume, engine->condition.audio_buff_size > 0 ? &engine->audio : NULL);
+}
+
 /* HTS_Engine_synthesize: synthesize speech */
 static HTS_Boolean HTS_Engine_synthesize(HTS_Engine * engine)
 {
@@ -500,6 +506,24 @@ static HTS_Boolean HTS_Engine_synthesize(HTS_Engine * engine)
       return FALSE;
    }
    if (HTS_Engine_generate_sample_sequence(engine) != TRUE) {
+      HTS_Engine_refresh(engine);
+      return FALSE;
+   }
+   return TRUE;
+}
+
+/* HTS_Engine_synthesize_WORLD: synthesize speech */
+static HTS_Boolean HTS_Engine_synthesize_WORLD(HTS_Engine * engine)
+{
+   if (HTS_Engine_generate_state_sequence(engine) != TRUE) {
+      HTS_Engine_refresh(engine);
+      return FALSE;
+   }
+   if (HTS_Engine_generate_parameter_sequence(engine) != TRUE) {
+      HTS_Engine_refresh(engine);
+      return FALSE;
+   }
+   if (HTS_Engine_generate_sample_sequence_WORLD(engine) != TRUE) {
       HTS_Engine_refresh(engine);
       return FALSE;
    }
@@ -520,6 +544,22 @@ HTS_Boolean HTS_Engine_synthesize_from_strings(HTS_Engine * engine, char **lines
    HTS_Engine_refresh(engine);
    HTS_Label_load_from_strings(&engine->label, engine->condition.sampling_frequency, engine->condition.fperiod, lines, num_lines);
    return HTS_Engine_synthesize(engine);
+}
+
+/* HTS_Engine_synthesize_from_fn_WORLD: synthesize speech from file name */
+HTS_Boolean HTS_Engine_synthesize_from_fn_WORLD(HTS_Engine * engine, const char *fn)
+{
+   HTS_Engine_refresh(engine);
+   HTS_Label_load_from_fn(&engine->label, engine->condition.sampling_frequency, engine->condition.fperiod, fn);
+   return HTS_Engine_synthesize_WORLD(engine);
+}
+
+/* HTS_Engine_synthesize_from_strings_WORLD: synthesize speech from strings */
+HTS_Boolean HTS_Engine_synthesize_from_strings_WORLD(HTS_Engine * engine, char **lines, size_t num_lines)
+{
+   HTS_Engine_refresh(engine);
+   HTS_Label_load_from_strings(&engine->label, engine->condition.sampling_frequency, engine->condition.fperiod, lines, num_lines);
+   return HTS_Engine_synthesize_WORLD(engine);
 }
 
 /* HTS_Engine_save_information: save trace information */

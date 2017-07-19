@@ -435,6 +435,12 @@ HTS_Boolean HTS_Engine_synthesize_from_fn(HTS_Engine * engine, const char *fn);
 /* HTS_Engine_synthesize_from_strings: synthesize speech from string list */
 HTS_Boolean HTS_Engine_synthesize_from_strings(HTS_Engine * engine, char **lines, size_t num_lines);
 
+/* HTS_Engine_synthesize_from_fn_WORLD: synthesize speech from file name with WORLD synthesizer */
+HTS_Boolean HTS_Engine_synthesize_from_fn_WORLD(HTS_Engine * engine, const char *fn);
+
+/* HTS_Engine_synthesize_from_strings_WORLD: synthesize speech from string list with WORLD synthesizer */
+HTS_Boolean HTS_Engine_synthesize_from_strings_WORLD(HTS_Engine * engine, char **lines, size_t num_lines);
+
 /* HTS_Engine_generate_state_sequence_from_fn: generate state sequence from file name (1st synthesis step) */
 HTS_Boolean HTS_Engine_generate_state_sequence_from_fn(HTS_Engine * engine, const char *fn);
 
@@ -446,6 +452,9 @@ HTS_Boolean HTS_Engine_generate_parameter_sequence(HTS_Engine * engine);
 
 /* HTS_Engine_generate_sample_sequence: generate sample sequence (3rd synthesis step) */
 HTS_Boolean HTS_Engine_generate_sample_sequence(HTS_Engine * engine);
+
+/* HTS_Engine_generate_sample_sequence_WORLD: generate sample sequence (3rd synthesis step) */
+HTS_Boolean HTS_Engine_generate_sample_sequence_WORLD(HTS_Engine * engine);
 
 /* HTS_Engine_save_information: save trace information */
 void HTS_Engine_save_information(HTS_Engine * engine, FILE * fp);

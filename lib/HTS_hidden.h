@@ -399,6 +399,9 @@ void HTS_GStreamSet_initialize(HTS_GStreamSet * gss);
 /* HTS_GStreamSet_create: generate speech */
 HTS_Boolean HTS_GStreamSet_create(HTS_GStreamSet * gss, HTS_PStreamSet * pss, size_t stage, HTS_Boolean use_log_gain, size_t sampling_rate, size_t fperiod, double alpha, double beta, HTS_Boolean * stop, double volume, HTS_Audio * audio);
 
+/* HTS_GStreamSet_create: generate speech */
+HTS_Boolean HTS_GStreamSet_create_WORLD(HTS_GStreamSet * gss, HTS_PStreamSet * pss, size_t stage, HTS_Boolean use_log_gain, size_t sampling_rate, size_t fperiod, double alpha, double beta, HTS_Boolean * stop, double volume, HTS_Audio * audio);
+
 /* HTS_GStreamSet_get_total_nsamples: get total number of sample */
 size_t HTS_GStreamSet_get_total_nsamples(HTS_GStreamSet * gss);
 
@@ -515,6 +518,7 @@ typedef struct _WORLD_Vocoder {
    size_t rate;                 /* sampling rate */
    size_t fft_size;             /* fft size */
    size_t total_frame;          /* total frames */
+   size_t wave_length;           /* wav length */
    double *f0_buff;             /* used in f0 */
    size_t f0_size;              /* buffer size for f0 */
    double **spectrum_buff;      /* used in spectrum */

@@ -154,8 +154,6 @@ HTS_Boolean HTS_GStreamSet_create_WORLD(HTS_GStreamSet * gss, HTS_PStreamSet * p
    size_t i, j, k;
    size_t msd_frame;
    WORLD_Vocoder v;
-   size_t nlpf = 0;
-   double *lpf = NULL;
    double gamma = 0.0;
 
    /* check */
@@ -167,7 +165,6 @@ HTS_Boolean HTS_GStreamSet_create_WORLD(HTS_GStreamSet * gss, HTS_PStreamSet * p
    /* initialize */
    gss->nstream = HTS_PStreamSet_get_nstream(pss);
    gss->total_frame = HTS_PStreamSet_get_total_frame(pss);
-   gss->total_nsample = fperiod * gss->total_frame;
    gss->gstream = (HTS_GStream *) HTS_calloc(gss->nstream, sizeof(HTS_GStream));
    for (i = 0; i < gss->nstream; i++) {
       gss->gstream[i].vector_length = HTS_PStreamSet_get_vector_length(pss, i);
@@ -175,7 +172,6 @@ HTS_Boolean HTS_GStreamSet_create_WORLD(HTS_GStreamSet * gss, HTS_PStreamSet * p
       for (j = 0; j < gss->total_frame; j++)
          gss->gstream[i].par[j] = (double *) HTS_calloc(gss->gstream[i].vector_length, sizeof(double));
    }
-   gss->gspeech = (double *) HTS_calloc(gss->total_nsample, sizeof(double));
 
    /* copy generated parameter */
    for (i = 0; i < gss->nstream; i++) {
@@ -212,6 +208,8 @@ HTS_Boolean HTS_GStreamSet_create_WORLD(HTS_GStreamSet * gss, HTS_PStreamSet * p
       return FALSE;
    }
    if (sampling_rate != 16000) {
+      // FFT_SIZE を決めるための暫定処置
+      // GetFFTSizeForCheapTrick を使えば sampling_rate に応じた FFT_SIZE を決めることが出来る
       HTS_error(1, "HTS_GStreamSet_create_WORLD: The number of sampling-rate should be 16kHz.");
       HTS_GStreamSet_clear(gss);
       return FALSE;
@@ -222,7 +220,17 @@ HTS_Boolean HTS_GStreamSet_create_WORLD(HTS_GStreamSet * gss, HTS_PStreamSet * p
 
    /* synthesize speech waveform with WORLD */
    WORLD_Vocoder_initialize(&v, gss->total_frame, sampling_rate, fperiod, WORLD_FFT_SIZE);
-   WORLD_Vocoder_synthesize(&v, gss->gstream[1].par, gss->gstream[0].par, gss->gstream[0].vector_length, alpha, gamma, gss->gstream[2].par, gss->gspeech, audio);
+
+   /* allocate waveform buffer for WORLD synthesis */
+   gss->total_nsample = v.wave_length;
+   gss->gspeech = (double *) HTS_calloc(v.wave_length, sizeof(double));
+
+   WORLD_Vocoder_synthesize(&v, gss->gstream[1].par /* lf0 */,
+      gss->gstream[0].par /* mcep */,
+      gss->gstream[0].vector_length /* mcep dim */,
+      alpha, gamma,
+      gss->gstream[2].par /* 5-band aperiodicity */,
+      gss->gspeech /* wavebuffer */, audio);
    WORLD_Vocoder_clear(&v);
    if (audio)
       HTS_Audio_flush(audio);

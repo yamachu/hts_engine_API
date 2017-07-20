@@ -30,7 +30,7 @@ static void SPTK_mgc2sp(WORLD_Vocoder * v, double **mcep, double alpha, double g
    phase_buff= (double *) HTS_calloc(v->fft_size, sizeof(double));
 
    for (i = 0; i < v->total_frame; i++) {
-      mgc2sp(mcep[i], mcep_dim - 1, alpha, gamma, sp_buff, phase_buff, v->fft_size);
+      mgc2sp(mcep[i], mcep_dim - 1, alpha, 0 /* gamma */, sp_buff, phase_buff, v->fft_size);
       for (j = 0; j < v->spectrum_size; j++)
          v->spectrum_buff[i][j] = exp(sp_buff[j] * 2);
    }
@@ -48,6 +48,8 @@ void WORLD_Vocoder_initialize(WORLD_Vocoder * v, size_t total_frame, size_t rate
    v->rate = rate;
    v->fft_size = fft_size;
    v->total_frame = total_frame;
+   // waveform length ref: https://github.com/mmorise/World/blob/master/test/test.cpp
+   v->wave_length = (size_t)((v->total_frame - 1) * v->fprd / 1000.0 * v->rate) + 1;
    /* init buffer */
    v->f0_buff = (double *) HTS_calloc(total_frame, sizeof(double));
    v->f0_size = total_frame;
@@ -84,17 +86,15 @@ void WORLD_Vocoder_synthesize(WORLD_Vocoder * v, double **lf0, double **mcep, si
       for (j = 256; j < 384; j++)
          v->aperiodicity_buff[i][j] = five_band_aperiodicity[i][3];
       for (j = 384; j < 513; j++)
-          v->aperiodicity_buff[i][j] = five_band_aperiodicity[i][4];
+         v->aperiodicity_buff[i][j] = five_band_aperiodicity[i][4];
    }
 
-   wav_length = v->total_frame * v->fprd;
-
    Synthesis(v->f0_buff, v->f0_size, v->spectrum_buff, v->aperiodicity_buff,
-      v->fft_size, v->fprd, v->rate, wav_length, rawdata);
+      v->fft_size, v->fprd, v->rate, v->wave_length, rawdata);
 
-   for (i = 0; i < wav_length; i++) {
+   for (i = 0; i < v->wave_length; i++) {
       rawdata[i] *= 32767.0;
-      if (rawdata[i] < 32767.0)
+      if (rawdata[i] > 32767.0)
          rawdata[i] = 32767.0;
       else if (rawdata[i] < -32768.0)
          rawdata[i] = -32768.0;
@@ -102,7 +102,7 @@ void WORLD_Vocoder_synthesize(WORLD_Vocoder * v, double **lf0, double **mcep, si
 
    /* output */
    if (audio) {
-      for (i = 0; i < v->total_frame * v->fprd; i++)
+      for (i = 0; i < v->wave_length; i++)
          HTS_Audio_write(audio, (short)rawdata[i]);
    }
 }

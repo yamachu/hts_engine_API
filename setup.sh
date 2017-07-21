@@ -1,5 +1,13 @@
 #!/bin/bash
 
+autoreconf --install --force --verbose
+CONF_SUCCESS=$?
+
+if [[ $CONF_SUCCESS != 0 ]]; then
+    echo 'Required automake and autoconf'
+    exit 1
+fi
+
 type git >/dev/null 2>&1
 GIT_EXIST=$?
 

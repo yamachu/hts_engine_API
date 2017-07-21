@@ -203,14 +203,22 @@ HTS_Boolean HTS_GStreamSet_create_WORLD(HTS_GStreamSet * gss, HTS_PStreamSet * p
       return FALSE;
    }
    if (gss->nstream >= 3 && gss->gstream[2].vector_length % 2 == 0) {
-      HTS_error(1, "HTS_GStreamSet_create_WORLD: The number of low-pass filter coefficient should be odd numbers.");
+      HTS_error(1, "HTS_GStreamSet_create_WORLD: The number of low-pass filter coefficient should be odd numbers.\n");
       HTS_GStreamSet_clear(gss);
       return FALSE;
    }
    if (sampling_rate != 16000) {
       // FFT_SIZE を決めるための暫定処置
       // GetFFTSizeForCheapTrick を使えば sampling_rate に応じた FFT_SIZE を決めることが出来る
-      HTS_error(1, "HTS_GStreamSet_create_WORLD: The number of sampling-rate should be 16kHz.");
+      HTS_error(1, "HTS_GStreamSet_create_WORLD: The number of sampling-rate should be 16kHz.\n");
+      HTS_error(1, "HTS_GStreamSet_create_WORLD: Check command-line args.");
+      HTS_GStreamSet_clear(gss);
+      return FALSE;
+   }
+   if (fperiod != 5) {
+      // 5 以外だと伸びてしまう．要確認
+      HTS_error(1, "HTS_GStreamSet_create_WORLD: The number of fperiod should be 5.\n");
+      HTS_error(1, "HTS_GStreamSet_create_WORLD: Check command-line args.\n");
       HTS_GStreamSet_clear(gss);
       return FALSE;
    }

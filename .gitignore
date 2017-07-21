@@ -34,4 +34,30 @@
 /SPTK
 /World
 
+bin/hts_engine
+
+# https://github.com/github/gitignore/blob/master/Autotools.gitignore
+/autom4te.cache/
+/autoscan.log
+/autoscan-*.log
+/aclocal.m4
+/compile
+/config.guess
+/config.h.in
+/config.sub
+/configure
+/configure.scan
+/depcomp
+/install-sh
+/missing
+/stamp-h1
+/config/
+config.log
+config.status
+/bin/Makefile
+/lib/Makefile
+Makefile
+Makefile.in
 .deps
+
+

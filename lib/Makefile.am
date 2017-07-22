@@ -23,6 +23,7 @@ libHTSEngine_a_SOURCES = HTS_audio.c  HTS_engine.c  HTS_hidden.h  HTS_misc.c  \
 						../SPTK/lib/movem.c \
 						../SPTK/lib/fillz.c \
 						../World/src/synthesis.cpp \
+						../World/src/cheaptrick.cpp \
 						../World/src/fft.cpp \
 						../World/src/common.cpp \
 						../World/src/matlabfunctions.cpp

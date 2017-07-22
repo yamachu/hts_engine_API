@@ -18,6 +18,7 @@ WORLD_VOCODER_C_START;
 
 #include "SPTK.h" /* for mgc2sp() */
 #include "world/synthesis.h" /* for synthesis() */
+#include "world/cheaptrick.h"
 
 /* SPTK_mgc2sp: mcep to sp */
 static void SPTK_mgc2sp(WORLD_Vocoder * v, double **mcep, double alpha, double gamma, size_t mcep_dim)
@@ -39,14 +40,23 @@ static void SPTK_mgc2sp(WORLD_Vocoder * v, double **mcep, double alpha, double g
    HTS_free(phase_buff);
 }
 
+/* WORLD_Get_FFT_Size: get FFT Size */
+static int WORLD_Get_FFT_Size(WORLD_Vocoder * v)
+{
+   CheapTrickOption option = { 0 };
+   InitializeCheapTrickOption(v->rate, &option);
+
+   return option.fft_size;
+}
+
 /* WORLD_Vocoder_initialize: initialize vocoder */
-void WORLD_Vocoder_initialize(WORLD_Vocoder * v, size_t total_frame, size_t rate, double fperiod, size_t fft_size)
+void WORLD_Vocoder_initialize(WORLD_Vocoder * v, size_t total_frame, size_t rate, double fperiod)
 {
    size_t i;
    /* set parameter */
-   v->fprd = fperiod;
+   v->fprd = fperiod / rate * 1000.0;
    v->rate = rate;
-   v->fft_size = fft_size;
+   v->fft_size = WORLD_Get_FFT_Size(v);
    v->total_frame = total_frame;
    // waveform length ref: https://github.com/mmorise/World/blob/master/test/test.cpp
    v->wave_length = (size_t)((v->total_frame - 1) * v->fprd / 1000.0 * v->rate) + 1;
@@ -55,12 +65,12 @@ void WORLD_Vocoder_initialize(WORLD_Vocoder * v, size_t total_frame, size_t rate
    v->f0_size = total_frame;
    v->spectrum_buff = (double **) HTS_calloc(total_frame, sizeof(double *));
    for (i = 0; i < total_frame; i++)
-      v->spectrum_buff[i] = (double *) HTS_calloc(fft_size / 2 + 1, sizeof(double));
-   v->spectrum_size = fft_size / 2 + 1;
+      v->spectrum_buff[i] = (double *) HTS_calloc(v->fft_size / 2 + 1, sizeof(double));
+   v->spectrum_size = v->fft_size / 2 + 1;
    v->aperiodicity_buff = (double **) HTS_calloc(total_frame, sizeof(double *));
    for (i = 0; i < total_frame; i++)
-      v->aperiodicity_buff[i] = (double *) HTS_calloc(fft_size / 2 + 1, sizeof(double));
-   v->aperiodicity_size = fft_size / 2 + 1;
+      v->aperiodicity_buff[i] = (double *) HTS_calloc(v->fft_size / 2 + 1, sizeof(double));
+   v->aperiodicity_size = v->fft_size / 2 + 1;
 }
 
 /* WORLD_Vocoder_synthesize: WORLD based waveform synthesis */

@@ -207,27 +207,12 @@ HTS_Boolean HTS_GStreamSet_create_WORLD(HTS_GStreamSet * gss, HTS_PStreamSet * p
       HTS_GStreamSet_clear(gss);
       return FALSE;
    }
-   if (sampling_rate != 16000) {
-      // FFT_SIZE を決めるための暫定処置
-      // GetFFTSizeForCheapTrick を使えば sampling_rate に応じた FFT_SIZE を決めることが出来る
-      HTS_error(1, "HTS_GStreamSet_create_WORLD: The number of sampling-rate should be 16kHz.\n");
-      HTS_error(1, "HTS_GStreamSet_create_WORLD: Check command-line args.");
-      HTS_GStreamSet_clear(gss);
-      return FALSE;
-   }
-   if (fperiod != 5) {
-      // 5 以外だと伸びてしまう．要確認
-      HTS_error(1, "HTS_GStreamSet_create_WORLD: The number of fperiod should be 5.\n");
-      HTS_error(1, "HTS_GStreamSet_create_WORLD: Check command-line args.\n");
-      HTS_GStreamSet_clear(gss);
-      return FALSE;
-   }
 
    if (stage != 0)
       gamma = -1.0 / stage;
 
    /* synthesize speech waveform with WORLD */
-   WORLD_Vocoder_initialize(&v, gss->total_frame, sampling_rate, fperiod, WORLD_FFT_SIZE);
+   WORLD_Vocoder_initialize(&v, gss->total_frame, sampling_rate, fperiod);
 
    /* allocate waveform buffer for WORLD synthesis */
    gss->total_nsample = v.wave_length;

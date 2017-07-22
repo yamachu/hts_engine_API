@@ -510,11 +510,9 @@ void HTS_Vocoder_clear(HTS_Vocoder * v);
 
 /* WORLD vocoder --------------------------------------------------- */
 
-#define WORLD_FFT_SIZE 1024
-
 /* WORLD_Vocoder: structure for setting of vocoder */
 typedef struct _WORLD_Vocoder {
-   double fprd;                 /* frame shift */
+   double fprd;                 /* WORLD frame shift */
    size_t rate;                 /* sampling rate */
    size_t fft_size;             /* fft size */
    size_t total_frame;          /* total frames */
@@ -528,7 +526,7 @@ typedef struct _WORLD_Vocoder {
 } WORLD_Vocoder;
 
 /* WORLD_Vocoder_initialize: initialize vocoder */
-void WORLD_Vocoder_initialize(WORLD_Vocoder * v, size_t total_frame, size_t rate, double fperiod, size_t fft_size);
+void WORLD_Vocoder_initialize(WORLD_Vocoder * v, size_t total_frame, size_t rate, double fperiod);
 
 /* WORLD_Vocoder_synthesize: WORLD based waveform synthesis */
 void WORLD_Vocoder_synthesize(WORLD_Vocoder * v, double **lf0, double **mcep, size_t mcep_dim, double alpha, double gamma, double **five_band_aperiodicity, double *rawdata, HTS_Audio * audio);

@@ -402,6 +402,12 @@ HTS_Boolean HTS_GStreamSet_create(HTS_GStreamSet * gss, HTS_PStreamSet * pss, si
 /* HTS_GStreamSet_create: generate speech */
 HTS_Boolean HTS_GStreamSet_create_WORLD(HTS_GStreamSet * gss, HTS_PStreamSet * pss, size_t stage, HTS_Boolean use_log_gain, size_t sampling_rate, size_t fperiod, double alpha, double beta, HTS_Boolean * stop, double volume, HTS_Audio * audio);
 
+/* HTS_GStreamSet_recreate: re-generate speech */
+HTS_Boolean HTS_GStreamSet_recreate(HTS_GStreamSet * gss, size_t stage, HTS_Boolean use_log_gain, size_t sampling_rate, size_t fperiod, double alpha, double beta, HTS_Boolean * stop, double volume, HTS_Audio * audio);
+
+/* HTS_GStreamSet_recreate: re-generate speech */
+HTS_Boolean HTS_GStreamSet_recreate_WORLD(HTS_GStreamSet * gss, size_t stage, HTS_Boolean use_log_gain, size_t sampling_rate, size_t fperiod, double alpha, double beta, HTS_Boolean * stop, double volume, HTS_Audio * audio);
+
 /* HTS_GStreamSet_get_total_nsamples: get total number of sample */
 size_t HTS_GStreamSet_get_total_nsamples(HTS_GStreamSet * gss);
 

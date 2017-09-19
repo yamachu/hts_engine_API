@@ -1,7 +1,7 @@
 
 EXTRA_DIST = Makefile.mak
 
-AM_CPPFLAGS = -I @top_srcdir@/include -I @top_srcdir@/World/src -I @top_srcdir@/SPTK/include
+AM_CPPFLAGS = -fPIC -I @top_srcdir@/include -I @top_srcdir@/World/src -I @top_srcdir@/SPTK/include
 SUBDIRS = ../SPTK ../World
 AUTOMAKE_OPTIONS = subdir-objects
 

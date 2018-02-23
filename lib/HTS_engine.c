@@ -817,6 +817,38 @@ void HTS_Engine_save_riff(HTS_Engine * engine, FILE * fp)
    }
 }
 
+/* HTS_Engine_allocate_generated_speech: save generated speech */
+size_t HTS_Engine_allocate_generated_speech(HTS_Engine * engine, short ** data)
+{
+   size_t i, total_sample;
+   double x;
+   short temp;
+   HTS_GStreamSet *gss = &engine->gss;
+
+   total_sample = HTS_GStreamSet_get_total_nsamples(gss);
+   *data = (short *) HTS_calloc(total_sample, sizeof(short));
+
+   for (i = 0; i < total_sample; i++) {
+      x = HTS_GStreamSet_get_speech(gss, i);
+      if (x > 32767.0)
+         temp = 32767;
+      else if (x < -32768.0)
+         temp = -32768;
+      else
+         temp = (short) x;
+      (*data)[i] = temp;
+   }
+
+   return total_sample;
+}
+
+/* HTS_Engine_free_generated_speech: save generated speech */
+void HTS_Engine_free_generated_speech(HTS_Engine * engine, short ** data)
+{
+   HTS_free(*data);
+   *data = NULL;
+}
+
 /* HTS_Engine_refresh: free model per one time synthesis */
 void HTS_Engine_refresh(HTS_Engine * engine)
 {

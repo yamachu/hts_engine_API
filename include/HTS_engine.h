@@ -483,6 +483,12 @@ void HTS_Engine_save_generated_speech(HTS_Engine * engine, FILE * fp);
 /* HTS_Engine_save_riff: save RIFF format file */
 void HTS_Engine_save_riff(HTS_Engine * engine, FILE * fp);
 
+/* HTS_Engine_allocate_generated_speech: save generated speech */
+size_t HTS_Engine_allocate_generated_speech(HTS_Engine * engine, short ** data);
+
+/* HTS_Engine_free_generated_speech: save generated speech */
+void HTS_Engine_free_generated_speech(HTS_Engine * engine, short ** data);
+
 /* HTS_Engine_refresh: free memory per one time synthesis */
 void HTS_Engine_refresh(HTS_Engine * engine);
 

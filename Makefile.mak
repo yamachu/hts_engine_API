@@ -4,26 +4,11 @@ INSTALLDIR = C:\hts_engine_API
 all: hts_engine
 
 hts_lib:
-	cd SPTK
-	nmake /f Makefile.mak DOUBLE=1
-	cd ..
-
-	cd World
-	nmake /f Makefile.mak
-	cd ..
-
 	cd lib
 	nmake /f Makefile.mak
 	cd ..
-	cd bin
-	nmake /f Makefile.mak
-	cd ..
 
-
-hts_engine:
-	cd lib
-	nmake /f Makefile.mak
-	cd ..
+hts_engine: hts_lib
 	cd bin
 	nmake /f Makefile.mak
 	cd ..

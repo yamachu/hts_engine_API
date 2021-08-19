@@ -399,14 +399,8 @@ void HTS_GStreamSet_initialize(HTS_GStreamSet * gss);
 /* HTS_GStreamSet_create: generate speech */
 HTS_Boolean HTS_GStreamSet_create(HTS_GStreamSet * gss, HTS_PStreamSet * pss, size_t stage, HTS_Boolean use_log_gain, size_t sampling_rate, size_t fperiod, double alpha, double beta, HTS_Boolean * stop, double volume, HTS_Audio * audio);
 
-/* HTS_GStreamSet_create: generate speech */
-HTS_Boolean HTS_GStreamSet_create_WORLD(HTS_GStreamSet * gss, HTS_PStreamSet * pss, size_t stage, HTS_Boolean use_log_gain, size_t sampling_rate, size_t fperiod, double alpha, double beta, HTS_Boolean * stop, double volume, HTS_Audio * audio);
-
 /* HTS_GStreamSet_recreate: re-generate speech */
 HTS_Boolean HTS_GStreamSet_recreate(HTS_GStreamSet * gss, size_t stage, HTS_Boolean use_log_gain, size_t sampling_rate, size_t fperiod, double alpha, double beta, HTS_Boolean * stop, double volume, HTS_Audio * audio);
-
-/* HTS_GStreamSet_recreate: re-generate speech */
-HTS_Boolean HTS_GStreamSet_recreate_WORLD(HTS_GStreamSet * gss, size_t stage, HTS_Boolean use_log_gain, size_t sampling_rate, size_t fperiod, double alpha, double beta, HTS_Boolean * stop, double volume, HTS_Audio * audio);
 
 /* HTS_GStreamSet_get_total_nsamples: get total number of sample */
 size_t HTS_GStreamSet_get_total_nsamples(HTS_GStreamSet * gss);
@@ -513,32 +507,6 @@ void HTS_Vocoder_synthesize(HTS_Vocoder * v, size_t m, double lf0, double *spect
 
 /* HTS_Vocoder_clear: clear vocoder */
 void HTS_Vocoder_clear(HTS_Vocoder * v);
-
-/* WORLD vocoder --------------------------------------------------- */
-
-/* WORLD_Vocoder: structure for setting of vocoder */
-typedef struct _WORLD_Vocoder {
-   double fprd;                 /* WORLD frame shift */
-   size_t rate;                 /* sampling rate */
-   size_t fft_size;             /* fft size */
-   size_t total_frame;          /* total frames */
-   size_t wave_length;           /* wav length */
-   double *f0_buff;             /* used in f0 */
-   size_t f0_size;              /* buffer size for f0 */
-   double **spectrum_buff;      /* used in spectrum */
-   size_t spectrum_size;        /* buffer size for spectrum */
-   double **aperiodicity_buff;  /* used in aperiodicity */
-   size_t aperiodicity_size;    /* buffer size for aperiodicity */
-} WORLD_Vocoder;
-
-/* WORLD_Vocoder_initialize: initialize vocoder */
-void WORLD_Vocoder_initialize(WORLD_Vocoder * v, size_t total_frame, size_t rate, double fperiod);
-
-/* WORLD_Vocoder_synthesize: WORLD based waveform synthesis */
-void WORLD_Vocoder_synthesize(WORLD_Vocoder * v, double **lf0, double **mcep, size_t mcep_dim, double alpha, double gamma, double **five_band_aperiodicity, double *rawdata, HTS_Audio * audio);
-
-/* WORLD_Vocoder_clear: clear vocoder */
-void WORLD_Vocoder_clear(WORLD_Vocoder * v);
 
 HTS_HIDDEN_H_END;
 

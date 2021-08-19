@@ -12,5 +12,3 @@ hts_engine_LDADD = ../lib/libHTSEngine.a
 DISTCLEANFILES = *.log *.out *~
 
 MAINTAINERCLEANFILES = Makefile.in
-
-CCLD = g++

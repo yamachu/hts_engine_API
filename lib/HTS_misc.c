@@ -245,7 +245,7 @@ size_t HTS_ftell(HTS_File * fp)
    } else if (fp->type == HTS_FILE) {
       // ref: https://github.com/oov/emsinsy/blob/db5356546d3f91ec1d430fcc809b6c7acadafb21/index.html#L153-L174
 #if defined(EMSCRIPTEN)
-      return (size_t) ftell((FILE *) fp-&gt;pointer);
+      return (size_t) ftell((FILE *) fp->pointer);
 #else
       fpos_t pos;
       fgetpos((FILE *) fp->pointer, &pos);
